@@ -1,31 +1,62 @@
 <template>
-  <header
+  <header 
     :class="[
+      'form-header',
       'flex items-center justify-between mb-6 px-3 lg:px-6 py-3.5',
       'border-b border-b-neutral-300/70'
-    ]"
+    ]" 
+    data-test="page-header"
   >
-    <div class="flex items-center gap-x-3">
-      <!-- Toggle button -->
-      <button class="md:hidden p-1.5 cursor-pointer hover:bg-neutral-200 rounded-full" @click="dashboard.toggleSidebar">
-        <PanelLeftIcon aria-hidden="true" class="size-5 stroke-neutral-700" />
-        <span class="sr-only">open sidebar</span>
-      </button>
+    <div class="page-header-content">
+      <div class="page-header-left">
+        <!-- Toggle button for mobile -->
+        <button 
+          class="md:hidden p-1.5 cursor-pointer hover:bg-neutral-200 rounded-full mr-3" 
+          @click="dashboard.toggleSidebar"
+        >
+          <PanelLeftIcon aria-hidden="true" class="size-5 stroke-neutral-700" />
+          <span class="sr-only">open sidebar</span>
+        </button>
 
-      <slot name="left" />
+        <breadcrumbs v-if="breadcrumbs && breadcrumbs.length > 0" data-test="page-header-breadcrumbs">
+          <h5 
+            v-for="(crumb, index) in breadcrumbs" 
+            :key="index"
+            class="breadcrum-item"
+            data-test="page-header-breadcrumb"
+          >
+            {{ crumb }}
+          </h5>
+        </breadcrumbs>
+        <h1 v-if="title" class="page-header-title" data-test="page-header-title">
+          {{ title }}
+        </h1>
+        <p v-if="description" class="page-header-description" data-test="page-header-description">
+          {{ description }}
+        </p>
+      </div>
+      <div v-if="$slots.actions" class="page-header-actions" data-test="page-header-actions">
+        <slot name="actions" />
+      </div>
     </div>
-
-    <slot />
-
-    <slot name="right" />
   </header>
 </template>
 
 <script setup lang="ts">
+// components
+import Breadcrumbs from "../Breadcrumbs.vue";
 import { PanelLeftIcon } from "lucide-vue";
-
 import { useDashboard } from "../../store/dashboard.ts";
+
 const dashboard = useDashboard();
+
+interface Props {
+  title?: string;
+  description?: string;
+  breadcrumbs?: string[];
+}
+
+defineProps<Props>();
 
 defineOptions({
   name: "DashboardPageHeader",
